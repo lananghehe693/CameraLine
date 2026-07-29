@@ -4,7 +4,7 @@
 
 
 //  ----------------------------------- Trigger Setting
-bool g_bUseTrigger = false;
+bool g_bUseTrigger = true;
 #define LINE_CAM_TRIGGER_SOURCE        "LineIn1"
 // "RisingEdge"  or  "FallingEdge"
 #define LINE_CAM_TRIGGER_ACTIVATION    "RisingEdge"
@@ -13,11 +13,11 @@ bool g_bUseTrigger = false;
 // ----------------------------------- Buffer Setting
 std::vector<std::vector<BYTE>> g_imgBuf1;
 size_t g_payloadBytes1 = 0;
-int g_nBufferSize = 3;
+int g_nBufferSize = 8;
 
 // ---------------------------------- Image Size
 int g_nWidth = 4096;
-int g_nHeight = 100;
+int g_nHeight = 1000;
 
 
 
@@ -415,7 +415,7 @@ bool RunAcquisitionLoop(SPHINX_CAMNR camNr,
         BYTE* buf = imgBufs[bufIndex].data();
 
         WORD res = GEVGetImageBuffer(camNr, &hdr, buf); // blocking
-
+        cout << "Test CamNr  " << (int)camNr << endl;
         if (res != GEV_STATUS_SUCCESS) {
             std::cout << "[AcquisitionLoop] Cam"
                 << " GEVGetImageBuffer error: " << GEVGetErrorString(res) << std::endl;
@@ -485,7 +485,7 @@ void TestRun()
     do {
         if (nProcess != nProcessOld) {
             nProcessOld = nProcess;
-            RunAcquisitionLoop(CAM1_NR, g_imgBuf1, 2 * g_nHeight, g_nWidth, g_nHeight, matShow);
+            RunAcquisitionLoop(CAM1_NR, g_imgBuf1, g_nHeight, g_nWidth, g_nHeight, matShow);
         }
 
         if (bDebugFlag) {
@@ -506,7 +506,7 @@ void TestRun()
                 //err = GEVSetFeatureCommand(CAM1_NR, "TriggerSoftware", cmd);
                 //if (err != GEV_STATUS_SUCCESS) { cout << "TriggerSoftware Failed" << endl; };
             }
-
+             
         }
     } while (bDebugFlag);
 }
@@ -515,7 +515,7 @@ void ShowAllFeatures(SPHINX_CAMNR camNr)
 {
     BYTE maxLevel;
     FeatureListPtr featureListPtr;
-    WORD error = GEVGetFeatureList(CAM1_NR, &featureListPtr, &maxLevel);
+    WORD error = GEVGetFeatureList(camNr, &featureListPtr, &maxLevel);
     if (featureListPtr == NULL) {
         cout << "Data null" << endl;
         return;
